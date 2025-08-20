@@ -1,0 +1,1341 @@
+//Aman Jain – Personal Portfolio Website
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aman Jain - Cyber Quest Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0a0a0a;
+            --secondary-color: #1a1a2e;
+            --accent-color: #00ff41;
+            --danger-color: #ff0040;
+            --warning-color: #ffaa00;
+            --text-light: #00ff41;
+            --text-white: #ffffff;
+            --bg-dark: #0f0f23;
+            --bg-card: #16213e;
+            --glow: 0 0 20px var(--accent-color);
+            --glow-red: 0 0 20px var(--danger-color);
+            --glow-orange: 0 0 20px var(--warning-color);
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--primary-color);
+            color: var(--text-light);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Game UI Elements */
+        .game-hud {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stat-bar {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--accent-color);
+            border-radius: 10px;
+            padding: 8px 12px;
+            min-width: 150px;
+            box-shadow: var(--glow);
+        }
+
+        .stat-label {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: var(--text-white);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), #00cc33);
+            width: 0%;
+            transition: width 2s ease;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        /* Matrix Background Animation */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: var(--primary-color);
+        }
+
+        .matrix-canvas {
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--accent-color);
+            z-index: 1000;
+            box-shadow: var(--glow);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-color);
+            animation: pulse-glow 2s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            from { text-shadow: 0 0 10px var(--accent-color); }
+            to { text-shadow: 0 0 20px var(--accent-color), 0 0 30px var(--accent-color); }
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-white);
+            font-family: 'Orbitron', monospace;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 16px;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+            box-shadow: var(--glow);
+            transform: scale(1.05);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--accent-color);
+            transition: 0.3s;
+            box-shadow: 0 0 5px var(--accent-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            background: radial-gradient(circle at center, var(--secondary-color) 0%, var(--primary-color) 100%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(0,255,65,0.1)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+            animation: grid-move 20s linear infinite;
+        }
+
+        @keyframes grid-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .hero-content {
+            max-width: 800px;
+            padding: 2rem;
+            z-index: 2;
+            position: relative;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            box-shadow: var(--glow);
+        }
+
+        .game-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--accent-color);
+            text-shadow: 0 0 20px var(--accent-color);
+            margin-bottom: 1rem;
+            animation: title-glitch 3s infinite;
+        }
+
+        @keyframes title-glitch {
+            0%, 98% { transform: none; }
+            99% { transform: skew(-2deg) scale(1.02); filter: hue-rotate(90deg); }
+        }
+
+        .game-subtitle {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            color: var(--warning-color);
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px var(--warning-color);
+        }
+
+        .start-button {
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(45deg, var(--accent-color), #00cc33);
+            color: var(--primary-color);
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            box-shadow: var(--glow);
+            animation: button-pulse 2s infinite;
+        }
+
+        @keyframes button-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .start-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--accent-color);
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 100px 0;
+            position: relative;
+            border-bottom: 2px solid rgba(0, 255, 65, 0.2);
+        }
+
+        .section:nth-child(even) {
+            background: rgba(26, 26, 46, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .level-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .level-badge {
+            display: inline-block;
+            background: var(--accent-color);
+            color: var(--primary-color);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            box-shadow: var(--glow);
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--text-white);
+            text-shadow: 0 0 15px var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .level-description {
+            color: var(--text-light);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* About Section */
+        .character-card {
+            background: var(--bg-card);
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: var(--glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .character-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+            animation: scan-line 3s infinite;
+        }
+
+        @keyframes scan-line {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        /* Skills Section */
+        .skill-tree {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .skill-node {
+            background: var(--bg-card);
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--glow);
+        }
+
+        .skill-node:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 0 40px var(--accent-color);
+        }
+
+        .skill-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, var(--accent-color), #00cc33);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--primary-color);
+            box-shadow: var(--glow);
+            animation: rotate-glow 4s linear infinite;
+        }
+
+        @keyframes rotate-glow {
+            0% { transform: rotate(0deg); box-shadow: var(--glow); }
+            50% { transform: rotate(180deg); box-shadow: 0 0 30px var(--accent-color); }
+            100% { transform: rotate(360deg); box-shadow: var(--glow); }
+        }
+
+        .skill-name {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-white);
+            margin-bottom: 1rem;
+        }
+
+        .skill-level {
+            background: var(--accent-color);
+            color: var(--primary-color);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        /* Projects Section */
+        .missions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .mission-card {
+            background: var(--bg-card);
+            border: 2px solid var(--warning-color);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .mission-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 30px var(--warning-color);
+            border-color: var(--danger-color);
+        }
+
+        .mission-header {
+            background: linear-gradient(45deg, var(--warning-color), #ff6600);
+            color: var(--primary-color);
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .mission-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            box-shadow: 0 0 10px var(--accent-color);
+            animation: status-blink 2s infinite;
+        }
+
+        @keyframes status-blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .mission-rank {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .mission-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .mission-content {
+            padding: 1.5rem;
+        }
+
+        .mission-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .mission-tag {
+            background: rgba(0, 255, 65, 0.2);
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Contact Section */
+        .terminal {
+            background: var(--primary-color);
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--glow);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .terminal-header {
+            background: var(--accent-color);
+            color: var(--primary-color);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .terminal-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .btn-close { background: var(--danger-color); }
+        .btn-minimize { background: var(--warning-color); }
+        .btn-maximize { background: var(--accent-color); }
+
+        .terminal-title {
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+        }
+
+        .terminal-content {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .terminal-form {
+            background: rgba(0, 255, 65, 0.05);
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 65, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--accent-color);
+            border-radius: 5px;
+            padding: 12px;
+            color: var(--text-white);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            box-shadow: var(--glow);
+            border-color: var(--text-light);
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, var(--accent-color), #00cc33);
+            color: var(--primary-color);
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: var(--glow);
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px var(--accent-color);
+        }
+
+        .contact-links {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-white);
+            text-decoration: none;
+            padding: 1rem;
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-link:hover {
+            background: rgba(0, 255, 65, 0.1);
+            border-color: var(--accent-color);
+            box-shadow: var(--glow);
+            transform: translateX(10px);
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, var(--accent-color), #00cc33);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            box-shadow: var(--glow);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-color);
+            border-top: 2px solid var(--accent-color);
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--accent-color);
+            text-decoration: none;
+            margin: 0 1rem;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            text-shadow: 0 0 10px var(--accent-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-menu {
+                position: fixed;
+                left: -100%;
+                top: 80px;
+                flex-direction: column;
+                background: rgba(0, 0, 0, 0.95);
+                width: 100%;
+                text-align: center;
+                transition: 0.3s;
+                border-top: 2px solid var(--accent-color);
+                padding: 2rem 0;
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .game-title {
+                font-size: 2.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .terminal-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .game-hud {
+                position: relative;
+                top: 0;
+                right: 0;
+                flex-direction: row;
+                justify-content: center;
+                margin: 2rem auto;
+                max-width: 90%;
+            }
+
+            .skill-tree,
+            .missions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Achievement popup */
+        .achievement {
+            position: fixed;
+            top: 100px;
+            right: -400px;
+            background: var(--bg-card);
+            border: 2px solid var(--accent-color);
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: var(--glow);
+            transition: all 0.5s ease;
+            z-index: 1002;
+        }
+
+        .achievement.show {
+            right: 20px;
+        }
+
+        .achievement-title {
+            font-family: 'Orbitron', monospace;
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Background -->
+    <div class="matrix-bg">
+        <canvas class="matrix-canvas" id="matrixCanvas"></canvas>
+    </div>
+
+    <!-- Game HUD -->
+    <div class="game-hud">
+        <div class="stat-bar">
+            <div class="stat-label">EXPLORATION</div>
+            <div class="stat-value" id="exploration">0%</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="explorationBar"></div>
+            </div>
+        </div>
+        <div class="stat-bar">
+            <div class="stat-label">LEVEL</div>
+            <div class="stat-value" id="level">1</div>
+        </div>
+        <div class="stat-bar">
+            <div class="stat-label">SCORE</div>
+            <div class="stat-value" id="score">0</div>
+        </div>
+    </div>
+
+    <!-- Achievement Popup -->
+    <div class="achievement" id="achievement">
+        <div class="achievement-title">ACHIEVEMENT UNLOCKED!</div>
+        <div class="achievement-text"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">CYBER QUEST</div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#about" class="nav-link">CHARACTER</a></li>
+                <li><a href="#skills" class="nav-link">SKILLS</a></li>
+                <li><a href="#projects" class="nav-link">MISSIONS</a></li>
+                <li><a href="#contact" class="nav-link">TERMINAL</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="game-title">AMAN JAIN</h1>
+            <p class="game-subtitle">Cybersecurity Specialist • Code Warrior</p>
+            <p style="margin: 1rem 0; font-size: 1.1rem;">Hello! I'm Aman Jain, a Computer Science Engineering student specializing in Cybersecurity.</p>
+            <button class="start-button" onclick="startGame()">START MISSION</button>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="level-header fade-in">
+                <div class="level-badge">Level 3 • Mission Archives</div>
+                <h2 class="section-title">COMPLETED MISSIONS</h2>
+                <p class="level-description">Browse through successfully executed cyber operations and projects</p>
+            </div>
+            
+            <div class="missions-grid">
+                <div class="mission-card fade-in" onclick="viewMission('cybersecurity')">
+                    <div class="mission-header">
+                        <div class="mission-status"></div>
+                        <div class="mission-rank">CLASSIFIED • HIGH PRIORITY</div>
+                        <h3 class="mission-title">SECURITY BREACH DETECTION</h3>
+                    </div>
+                    <div class="mission-content">
+                        <p>Advanced cybersecurity assessment tool built using Kali Linux and custom Python scripts for comprehensive vulnerability scanning and penetration testing.</p>
+                        <div class="mission-tags">
+                            <span class="mission-tag">Kali Linux</span>
+                            <span class="mission-tag">Python</span>
+                            <span class="mission-tag">Security</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mission-card fade-in" onclick="viewMission('frontend')">
+                    <div class="mission-header">
+                        <div class="mission-status"></div>
+                        <div class="mission-rank">ACTIVE • MEDIUM PRIORITY</div>
+                        <h3 class="mission-title">DIGITAL INTERFACE CREATION</h3>
+                    </div>
+                    <div class="mission-content">
+                        <p>Interactive web portfolio showcasing modern frontend development skills with smooth animations, responsive design, and engaging user experiences.</p>
+                        <div class="mission-tags">
+                            <span class="mission-tag">HTML5</span>
+                            <span class="mission-tag">CSS3</span>
+                            <span class="mission-tag">JavaScript</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mission-card fade-in" onclick="viewMission('algorithms')">
+                    <div class="mission-header">
+                        <div class="mission-status"></div>
+                        <div class="mission-rank">COMPLETED • HIGH PRIORITY</div>
+                        <h3 class="mission-title">ALGORITHM OPTIMIZATION</h3>
+                    </div>
+                    <div class="mission-content">
+                        <p>Implementation and optimization suite for various data structures and algorithms in C++, focusing on performance analysis and complexity reduction.</p>
+                        <div class="mission-tags">
+                            <span class="mission-tag">C++</span>
+                            <span class="mission-tag">DSA</span>
+                            <span class="mission-tag">Optimization</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="level-header fade-in">
+                <div class="level-badge">Level 4 • Communication Hub</div>
+                <h2 class="section-title">ESTABLISH CONNECTION</h2>
+                <p class="level-description">Initiate secure communication protocols</p>
+            </div>
+            
+            <div class="terminal fade-in">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <div class="terminal-button btn-close"></div>
+                        <div class="terminal-button btn-minimize"></div>
+                        <div class="terminal-button btn-maximize"></div>
+                    </div>
+                    <div class="terminal-title">SECURE TERMINAL v2.0</div>
+                </div>
+                <div class="terminal-content">
+                    <form class="terminal-form" onsubmit="sendMessage(event)">
+                        <div class="form-group">
+                            <label for="name">AGENT NAME</label>
+                            <input type="text" id="name" name="name" required placeholder="Enter your codename...">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">SECURE CHANNEL</label>
+                            <input type="email" id="email" name="email" required placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">ENCRYPTED MESSAGE</label>
+                            <textarea id="message" name="message" rows="5" required placeholder="Transmit your message..."></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">TRANSMIT MESSAGE</button>
+                    </form>
+                    <div class="contact-info">
+                        <h3 style="color: var(--accent-color); font-family: 'Orbitron', monospace; margin-bottom: 1rem;">COMMUNICATION CHANNELS</h3>
+                        <p style="margin-bottom: 2rem;">Ready to collaborate on cybersecurity projects, discuss technology, or explore new opportunities in the digital realm.</p>
+                        <div class="contact-links">
+                            <a href="mailto:aman@example.com" class="contact-link">
+                                <div class="contact-icon">✉</div>
+                                <div>
+                                    <strong>Secure Email</strong><br>
+                                    <span>aman@example.com</span>
+                                </div>
+                            </a>
+                            <a href="https://github.com/amanjain" class="contact-link" target="_blank">
+                                <div class="contact-icon">🐙</div>
+                                <div>
+                                    <strong>Code Repository</strong><br>
+                                    <span>GitHub Profile</span>
+                                </div>
+                            </a>
+                            <a href="https://linkedin.com/in/amanjain" class="contact-link" target="_blank">
+                                <div class="contact-icon">💼</div>
+                                <div>
+                                    <strong>Professional Network</strong><br>
+                                    <span>LinkedIn Profile</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#about">CHARACTER</a>
+                <a href="#skills">SKILLS</a>
+                <a href="#projects">MISSIONS</a>
+                <a href="#contact">TERMINAL</a>
+            </div>
+            <p style="font-family: 'Orbitron', monospace; color: var(--accent-color);">© 2025 AMAN JAIN • CYBER QUEST PORTFOLIO • ALL SYSTEMS OPERATIONAL</p>
+        </div>
+    </footer>
+
+    <script>
+        // Game State
+        let gameState = {
+            level: 1,
+            score: 0,
+            exploration: 0,
+            achievements: []
+        };
+
+        // Matrix Background Animation
+        function initMatrix() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&()&^%+-/~{[|`]}";
+            const matrixArray = matrix.split("");
+            
+            const fontSize = 10;
+            const columns = canvas.width / fontSize;
+            const drops = [];
+            
+            for(let x = 0; x < columns; x++) {
+                drops[x] = 1;
+            }
+            
+            function drawMatrix() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#00ff41';
+                ctx.font = fontSize + 'px monospace';
+                
+                for(let i = 0; i < drops.length; i++) {
+                    const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    
+                    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+            
+            setInterval(drawMatrix, 35);
+        }
+
+        // Game Functions
+        function startGame() {
+            showAchievement("Mission Started", "Welcome to the Cyber Quest!");
+            updateScore(100);
+            document.querySelector('#about').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function upgradeSkill(skillType) {
+            const skills = {
+                'cybersecurity': { name: 'Cybersecurity Mastery', points: 150 },
+                'frontend': { name: 'Frontend Expertise', points: 120 },
+                'programming': { name: 'Programming Prowess', points: 140 }
+            };
+            
+            if (skills[skillType]) {
+                showAchievement("Skill Upgraded!", ${skills[skillType].name} enhanced!);
+                updateScore(skills[skillType].points);
+                updateLevel();
+            }
+        }
+
+        function viewMission(missionType) {
+            const missions = {
+                'cybersecurity': { name: 'Security Expert', points: 200 },
+                'frontend': { name: 'Interface Designer', points: 180 },
+                'algorithms': { name: 'Algorithm Master', points: 220 }
+            };
+            
+            if (missions[missionType]) {
+                showAchievement("Mission Reviewed", ${missions[missionType].name} mission analyzed!);
+                updateScore(missions[missionType].points);
+            }
+        }
+
+        function sendMessage(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const name = formData.get('name');
+            const email = formData.get('email');
+            const message = formData.get('message');
+            
+            if (name && email && message) {
+                showAchievement("Message Transmitted", "Secure communication established!");
+                updateScore(300);
+                updateLevel();
+                
+                // Simulate message sending with cyber-themed response
+                setTimeout(() => {
+                    alert('🔒 MESSAGE ENCRYPTED & TRANSMITTED SUCCESSFULLY 🔒\n\n' +
+                          'Agent ' + name + ', your message has been received through our secure channels.\n' +
+                          'Response will be transmitted within 24-48 hours.\n\n' +
+                          'Connection terminated. Stay vigilant.');
+                    form.reset();
+                }, 500);
+            } else {
+                alert('⚠ TRANSMISSION FAILED ⚠\nAll fields required for secure communication.');
+            }
+        }
+
+        function updateScore(points) {
+            gameState.score += points;
+            document.getElementById('score').textContent = gameState.score.toLocaleString();
+            
+            // Update exploration based on score
+            const newExploration = Math.min(100, Math.floor(gameState.score / 100));
+            if (newExploration > gameState.exploration) {
+                gameState.exploration = newExploration;
+                document.getElementById('exploration').textContent = gameState.exploration + '%';
+                document.getElementById('explorationBar').style.width = gameState.exploration + '%';
+            }
+        }
+
+        function updateLevel() {
+            const newLevel = Math.floor(gameState.score / 500) + 1;
+            if (newLevel > gameState.level) {
+                gameState.level = newLevel;
+                document.getElementById('level').textContent = gameState.level;
+                showAchievement("Level Up!", You've reached Level ${gameState.level}!);
+            }
+        }
+
+        function showAchievement(title, text) {
+            const achievement = document.getElementById('achievement');
+            const titleEl = achievement.querySelector('.achievement-title');
+            const textEl = achievement.querySelector('.achievement-text');
+            
+            titleEl.textContent = title;
+            textEl.textContent = text;
+            
+            achievement.classList.add('show');
+            
+            setTimeout(() => {
+                achievement.classList.remove('show');
+            }, 3000);
+        }
+
+        // Navigation Functions
+        function initNavigation() {
+            const hamburger = document.getElementById('hamburger');
+            const navMenu = document.getElementById('nav-menu');
+            
+            hamburger.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                hamburger.classList.toggle('active');
+                updateScore(10); // Small reward for interaction
+            });
+
+            // Close mobile menu when clicking on a link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    navMenu.classList.remove('active');
+                    hamburger.classList.remove('active');
+                    
+                    // Smooth scrolling
+                    e.preventDefault();
+                    const target = document.querySelector(link.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        updateScore(25); // Reward for navigation
+                    }
+                });
+            });
+        }
+
+        // Scroll Animations
+        function initScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        updateScore(50); // Reward for exploring content
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // Active Navigation State
+        function updateActiveNav() {
+            window.addEventListener('scroll', () => {
+                const sections = document.querySelectorAll('section[id]');
+                const navLinks = document.querySelectorAll('.nav-link');
+                
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 100;
+                    if (window.scrollY >= sectionTop) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // Enhanced Interactions
+        function initEnhancedInteractions() {
+            // Skill nodes click effects
+            document.querySelectorAll('.skill-node').forEach(node => {
+                node.addEventListener('click', function() {
+                    this.style.animation = 'none';
+                    setTimeout(() => {
+                        this.style.animation = '';
+                    }, 10);
+                });
+            });
+
+            // Mission cards hover effects
+            document.querySelectorAll('.mission-card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    const status = card.querySelector('.mission-status');
+                    status.style.background = '#ff0040';
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    const status = card.querySelector('.mission-status');
+                    status.style.background = '#00ff41';
+                });
+            });
+
+            // Terminal typing effect
+            const inputs = document.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    updateScore(1); // Small reward for typing
+                });
+            });
+        }
+
+        // Konami Code Easter Egg
+        function initKonamiCode() {
+            const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+            let userCode = [];
+            
+            document.addEventListener('keydown', (e) => {
+                userCode.push(e.keyCode);
+                
+                if (userCode.length > konamiCode.length) {
+                    userCode.shift();
+                }
+                
+                if (userCode.join(',') === konamiCode.join(',')) {
+                    showAchievement("KONAMI CODE ACTIVATED!", "Secret cyber abilities unlocked!");
+                    updateScore(1000);
+                    document.body.style.filter = 'hue-rotate(180deg)';
+                    setTimeout(() => {
+                        document.body.style.filter = '';
+                    }, 3000);
+                }
+            });
+        }
+
+        // Auto-save game state
+        function saveGameState() {
+            setInterval(() => {
+                localStorage.setItem('cyberQuestSave', JSON.stringify(gameState));
+            }, 5000);
+        }
+
+        function loadGameState() {
+            const saved = localStorage.getItem('cyberQuestSave');
+            if (saved) {
+                gameState = JSON.parse(saved);
+                document.getElementById('level').textContent = gameState.level;
+                document.getElementById('score').textContent = gameState.score.toLocaleString();
+                document.getElementById('exploration').textContent = gameState.exploration + '%';
+                document.getElementById('explorationBar').style.width = gameState.exploration + '%';
+            }
+        }
+
+        // Initialize everything when page loads
+        window.addEventListener('load', () => {
+            initMatrix();
+            initNavigation();
+            initScrollAnimations();
+            updateActiveNav();
+            initEnhancedInteractions();
+            initKonamiCode();
+            loadGameState();
+            saveGameState();
+            
+            // Welcome message after a delay
+            setTimeout(() => {
+                showAchievement("System Online", "Cyber Quest Portfolio initialized!");
+            }, 2000);
+        });
+
+        // Handle window resize for matrix
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('matrixCanvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>">
+                <div class="level-badge">Level 1 • Character Profile</div>
+                <h2 class="section-title">CHARACTER BIO</h2>
+                <p class="level-description">Meet the cyber warrior ready to tackle any digital challenge</p>
+            </div>
+            
+            <div class="character-card fade-in">
+                <div style="position: relative; z-index: 2;">
+                    <p style="font-size: 1.2rem; line-height: 1.8; margin-bottom: 2rem;">
+                        I'm passionate about exploring how systems work, securing them, and building creative tech solutions. I love learning constantly and improving my skills. Currently, I'm working with Kali Linux for cybersecurity projects, and expanding my knowledge in frontend development with HTML, CSS, and JavaScript.
+                    </p>
+                    <p style="font-size: 1.2rem; line-height: 1.8; margin-bottom: 2rem;">
+                        I'm also sharpening my programming skills in C, C++, and diving deep into Data Structures & Algorithms. I'm a strong believer in teamwork and effective communication, and I approach every challenge with hard work, curiosity, and a drive to learn quickly.
+                    </p>
+                    <p style="font-size: 1.2rem; line-height: 1.8;">
+                        Whether it's debugging code, securing a system, or designing an interface, I enjoy the process as much as the result. When I'm not working on tech, I'm probably exploring new tools, reading about the latest in cybersecurity, or collaborating on group projects.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="section">
+        <div class="container">
+            <div class="level-header fade-in">
+                <div class="level-badge">Level 2 • Skill Tree</div>
+                <h2 class="section-title">ABILITIES & SKILLS</h2>
+                <p class="level-description">Unlock and upgrade your cyber warfare capabilities</p>
+            </div>
+            
+            <div class="skill-tree">
+                <div class="skill-node fade-in" onclick="upgradeSkill('cybersecurity')">
+                    <div class="skill-icon">🔒</div>
+                    <div class="skill-level">LEVEL 4</div>
+                    <h3 class="skill-name">CYBERSECURITY</h3>
+                    <p>Master of digital defense systems. Proficient in Kali Linux, penetration testing, and vulnerability assessment.</p>
+                </div>
+                <div class="skill-node fade-in" onclick="upgradeSkill('frontend')">
+                    <div class="skill-icon">🌐</div>
+                    <div class="skill-level">LEVEL 3</div>
+                    <h3 class="skill-name">FRONTEND DEV</h3>
+                    <p>Architect of digital interfaces. Expert in HTML, CSS, JavaScript, and responsive web design.</p>
+                </div>
+                <div class="skill-node fade-in" onclick="upgradeSkill('programming')">
+                    <div class="skill-icon">💻</div>
+                    <div class="skill-level">LEVEL 4</div>
+                    <h3 class="skill-name">PROGRAMMING</h3>
+                    <p>Code warrior specializing in C, C++, and advanced Data Structures & Algorithms.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section">
+        <div class="container">
+            <div class="level-header fade-in
